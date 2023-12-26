@@ -34,7 +34,7 @@ public class Program
                 app.UseCors("CorsPolicy");
                 app.Run(async context =>
                 {
-                    Console.WriteLine("Called");
+                  //  Console.WriteLine("Called");
                     if (context.Request.Path == "/api/file")
                     {
                         // Console.WriteLine("Called2");
@@ -64,10 +64,13 @@ public class Program
                                 FilePath = filePath,
                                 jsonData = jsx
                             };
-                            Console.WriteLine(fileInfo.ToString());
+                           // Console.WriteLine(fileInfo.ToString());
 
                             var json = JsonConvert.SerializeObject(fileInfo);
                             context.Response.ContentType = "application/json";
+
+                            File.Delete(filePath);
+
                             await context.Response.WriteAsync(json, Encoding.UTF8);
                         }
                     }
@@ -79,7 +82,7 @@ public class Program
                     {
                         var file = context.Request.Form.Files[0];
                         var fileName = file.FileName;
-                        Console.WriteLine("result name : " + fileName.ToString());
+                      //  Console.WriteLine("result name : " + fileName.ToString());
 
                         await context.Response.WriteAsync("result name : " + fileName.ToString());
                     }
@@ -898,7 +901,7 @@ public class Program
             }
             hv_JsonString.Dispose();
             HOperatorSet.DictToJson(hv_GradingResults, new HTuple(), new HTuple(), out hv_JsonString);
-            Console.WriteLine("JSN: " + hv_JsonString.ToString());
+          //  Console.WriteLine("JSN: " + hv_JsonString.ToString());
 
             return hv_JsonString;
         }

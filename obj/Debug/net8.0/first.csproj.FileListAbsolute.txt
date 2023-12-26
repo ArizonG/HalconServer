@@ -70,3 +70,4 @@ C:\Users\DELL\Documents\Cprograms\first\obj\Debug\net8.0\first.genruntimeconfig.
 C:\Users\DELL\Documents\Cprograms\first\obj\Debug\net8.0\ref\first.dll
 C:\Users\DELL\Documents\Cprograms\first\bin\Debug\net8.0\Microsoft.AspNetCore.Cors.dll
 C:\Users\DELL\Documents\Cprograms\first\bin\Debug\net8.0\MVTec.HalconDotNet.dll
+C:\Users\DELL\Documents\Cprograms\first\obj\Debug\net8.0\first.sourcelink.json
