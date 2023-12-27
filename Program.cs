@@ -53,9 +53,8 @@ public class Program
                             {
                                 await file.CopyToAsync(stream);
                             }
-
                             var fileSize = file.Length;
-                            String jsx = Action();
+                            String jsx = Action(filePath);
                             Console.WriteLine("JSON  DATA : " + jsx);
 
                             var fileInfo = new
@@ -64,7 +63,7 @@ public class Program
                                 FilePath = filePath,
                                 jsonData = jsx
                             };
-                           // Console.WriteLine(fileInfo.ToString());
+                            Console.WriteLine(fileInfo.ToString());
 
                             var json = JsonConvert.SerializeObject(fileInfo);
                             context.Response.ContentType = "application/json";
@@ -82,7 +81,7 @@ public class Program
                     {
                         var file = context.Request.Form.Files[0];
                         var fileName = file.FileName;
-                      //  Console.WriteLine("result name : " + fileName.ToString());
+                        Console.WriteLine("result name : " + fileName.ToString());
 
                         await context.Response.WriteAsync("result name : " + fileName.ToString());
                     }
@@ -866,7 +865,7 @@ public class Program
     }
 
     // Main procedure 
-    public static String Action()
+    public static String Action(String filepath)
     {
         // Local iconic variables 
 
@@ -883,7 +882,7 @@ public class Program
         try
         {
             ho_Mat.Dispose();
-            HOperatorSet.ReadImage(out ho_Mat, "C:/Users/DELL/Desktop/mat.png");
+            HOperatorSet.ReadImage(out ho_Mat, filepath);
 
             hv_DataCodeHandle.Dispose();
             HOperatorSet.CreateDataCode2dModel("Data Matrix ECC 200", new HTuple(), new HTuple(),
