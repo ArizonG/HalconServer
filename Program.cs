@@ -22,7 +22,7 @@ public class Program
     {
         var host = new WebHostBuilder()
             .UseKestrel()
-            .UseUrls("http://localhost:8080")
+            .UseUrls("http://localhost:8080", "http://192.168.1.7:8080")
             .ConfigureServices(services => services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>().AddCors(options => options.AddPolicy("CorsPolicy",
                 builder => builder
                     .AllowAnyMethod()
@@ -895,7 +895,7 @@ public class Program
             using (HDevDisposeHelper dh = new HDevDisposeHelper())
             {
                 hv_GradingResults.Dispose();
-                grade_data_code_2d(hv_DataCodeHandle, hv_ResultHandles.TupleSelect(0), "isoiec15415",
+                grade_data_code_2d(hv_DataCodeHandle, hv_ResultHandles, "isoiec15415",
                     "numeric", "grades", out hv_GradingResults);
             }
             hv_JsonString.Dispose();
@@ -916,6 +916,7 @@ public class Program
             hv_JsonString.Dispose();
 
             //  throw HDevExpDefaultException;
+            Console.WriteLine(HDevExpDefaultException.ToString());
             return "NA";
         }
         ho_Mat.Dispose();
