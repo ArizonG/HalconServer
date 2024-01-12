@@ -14,15 +14,19 @@ using HalconDotNet;
 using System;
 using System.IO;
 using Microsoft.Extensions.Hosting;
+using System.Text.Json.Nodes;
+using Microsoft.VisualBasic;
 
 
 public class Program
 {
+
+    public static String decodedString = "";
     public static async Task Main(string[] args)
     {
         var host = new WebHostBuilder()
             .UseKestrel()
-            .UseUrls("http://localhost:8080", "http://192.168.1.7:8080")
+            .UseUrls("http://localhost:8080", "http://192.168.0.106:8080")
             .ConfigureServices(services => services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>().AddCors(options => options.AddPolicy("CorsPolicy",
                 builder => builder
                     .AllowAnyMethod()
@@ -34,7 +38,7 @@ public class Program
                 app.UseCors("CorsPolicy");
                 app.Run(async context =>
                 {
-                  //  Console.WriteLine("Called");
+                    //  Console.WriteLine("Called");
                     if (context.Request.Path == "/api/file")
                     {
                         // Console.WriteLine("Called2");
@@ -55,17 +59,25 @@ public class Program
                             }
                             var fileSize = file.Length;
                             String jsx = Action(filePath);
-                            Console.WriteLine("JSON  DATA : " + jsx);
+                            //var jso = Action(filePath);
+                            // String jsx = (string)jso["grades"];
+                            // String decodeds = (string)jso["decoded"];
+                            // Console.WriteLine("Decoded: " + decoded);
+                            // Console.WriteLine("JSON  DATA : " + jsx);
 
                             var fileInfo = new
                             {
                                 FileName = fileName,
                                 FilePath = filePath,
-                                jsonData = jsx
+                                jsonData = jsx,
+                                decoded = decodedString
                             };
-                            Console.WriteLine(fileInfo.ToString());
+
+                            //  Console.WriteLine(decodedString + ": DEDE");
+                            // Console.WriteLine(fileInfo.ToString());
 
                             var json = JsonConvert.SerializeObject(fileInfo);
+                            //var json = JsonConvert.SerializeObject(jso);
                             context.Response.ContentType = "application/json";
 
                             File.Delete(filePath);
@@ -75,6 +87,7 @@ public class Program
                     }
                     else if (context.Request.Path == "/api/check")
                     {
+
                         await context.Response.WriteAsync("Server is on");
                     }
                     else if (context.Request.Path == "/api/filename")
@@ -868,6 +881,7 @@ public class Program
     public static String Action(String filepath)
     {
         // Local iconic variables 
+        Console.WriteLine("HERE");
 
         HObject ho_Mat, ho_SymbolXLDs;
 
@@ -881,16 +895,22 @@ public class Program
         HOperatorSet.GenEmptyObj(out ho_SymbolXLDs);
         try
         {
+            //  Console.WriteLine("DEDE");
             ho_Mat.Dispose();
             HOperatorSet.ReadImage(out ho_Mat, filepath);
 
             hv_DataCodeHandle.Dispose();
             HOperatorSet.CreateDataCode2dModel("Data Matrix ECC 200", new HTuple(), new HTuple(),
                 out hv_DataCodeHandle);
+            //  Console.WriteLine("DEDE2");
 
             ho_SymbolXLDs.Dispose(); hv_ResultHandles.Dispose(); hv_DecodedDataStrings.Dispose();
             HOperatorSet.FindDataCode2d(ho_Mat, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
                 new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
+            // Console.WriteLine("DED33E");
+            decodedString = hv_DecodedDataStrings.ToString();
+            Console.WriteLine("decoded: " + hv_DecodedDataStrings.ToString());
+
 
             using (HDevDisposeHelper dh = new HDevDisposeHelper())
             {
@@ -898,9 +918,20 @@ public class Program
                 grade_data_code_2d(hv_DataCodeHandle, hv_ResultHandles, "isoiec15415",
                     "numeric", "grades", out hv_GradingResults);
             }
+            //   Console.WriteLine("DEDE44");
+
             hv_JsonString.Dispose();
             HOperatorSet.DictToJson(hv_GradingResults, new HTuple(), new HTuple(), out hv_JsonString);
-          //  Console.WriteLine("JSN: " + hv_JsonString.ToString());
+            //  Console.WriteLine("JSN: " + hv_JsonString.ToString());
+            // Console.WriteLine("DEDE55");
+
+            // var jso = new
+            // {
+            //     decoded = hv_DecodedDataStrings.ToString(),
+            //     jsonData = hv_JsonString.ToString()
+            // };
+            // return jso;
+            // decodedString = hv_DecodedDataStrings.ToString();
 
             return hv_JsonString;
         }
@@ -917,9 +948,74 @@ public class Program
 
             //  throw HDevExpDefaultException;
             Console.WriteLine(HDevExpDefaultException.ToString());
+
+            decodedString = "";
+            // var jso = new
+            // {
+            //     decoded = "NA",
+            //     jsonData = "NA"
+            // };
+            // return jso;
             return "NA";
         }
         ho_Mat.Dispose();
+        ho_SymbolXLDs.Dispose();
+
+        hv_DataCodeHandle.Dispose();
+        hv_ResultHandles.Dispose();
+        hv_DecodedDataStrings.Dispose();
+        hv_GradingResults.Dispose();
+        hv_JsonString.Dispose();
+
+    }
+
+    // Main procedure 
+    private static void action()
+    {
+
+
+        // Local iconic variables 
+
+        HObject ho_Image, ho_SymbolXLDs;
+
+        // Local control variables 
+
+        HTuple hv_DataCodeHandle = new HTuple(), hv_ResultHandles = new HTuple();
+        HTuple hv_DecodedDataStrings = new HTuple(), hv_GradingResults = new HTuple();
+        HTuple hv_JsonString = new HTuple();
+        // Initialize local and output iconic variables 
+        HOperatorSet.GenEmptyObj(out ho_Image);
+        HOperatorSet.GenEmptyObj(out ho_SymbolXLDs);
+        try
+        {
+            ho_Image.Dispose();
+            HOperatorSet.ReadImage(out ho_Image, "C:/Users/DELL/Desktop/Codes/temp7.png");
+            hv_DataCodeHandle.Dispose();
+            HOperatorSet.CreateDataCode2dModel("Data Matrix ECC 200", new HTuple(), new HTuple(),
+                out hv_DataCodeHandle);
+            ho_SymbolXLDs.Dispose(); hv_ResultHandles.Dispose(); hv_DecodedDataStrings.Dispose();
+            HOperatorSet.FindDataCode2d(ho_Image, out ho_SymbolXLDs, hv_DataCodeHandle,
+                new HTuple(), new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
+            hv_GradingResults.Dispose();
+            grade_data_code_2d(hv_DataCodeHandle, hv_ResultHandles, "isoiec15415", "numeric",
+                "grades", out hv_GradingResults);
+            hv_JsonString.Dispose();
+            HOperatorSet.DictToJson(hv_GradingResults, new HTuple(), new HTuple(), out hv_JsonString);
+        }
+        catch (HalconException HDevExpDefaultException)
+        {
+            ho_Image.Dispose();
+            ho_SymbolXLDs.Dispose();
+
+            hv_DataCodeHandle.Dispose();
+            hv_ResultHandles.Dispose();
+            hv_DecodedDataStrings.Dispose();
+            hv_GradingResults.Dispose();
+            hv_JsonString.Dispose();
+
+            throw HDevExpDefaultException;
+        }
+        ho_Image.Dispose();
         ho_SymbolXLDs.Dispose();
 
         hv_DataCodeHandle.Dispose();
