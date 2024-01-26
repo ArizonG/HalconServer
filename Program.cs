@@ -16,6 +16,8 @@ using System.IO;
 using Microsoft.Extensions.Hosting;
 using System.Text.Json.Nodes;
 using Microsoft.VisualBasic;
+using System.Net.Sockets;
+using System.Net.NetworkInformation;
 
 
 public class Program
@@ -24,9 +26,12 @@ public class Program
     public static String decodedString = "";
     public static async Task Main(string[] args)
     {
+        var localIP = GetLocalIpAddress2();
+        var cUrl = "http://" + localIP + ":8080";
+        Console.WriteLine(localIP + " : IP");
         var host = new WebHostBuilder()
             .UseKestrel()
-            .UseUrls("http://localhost:8080", "http://192.168.0.106:8080")
+            .UseUrls("http://localhost:8080", cUrl)
             .ConfigureServices(services => services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>().AddCors(options => options.AddPolicy("CorsPolicy",
                 builder => builder
                     .AllowAnyMethod()
@@ -105,7 +110,56 @@ public class Program
         await host.RunAsync();
     }
 
+public static string GetLocalIpAddress2()
+    {
+        string localIpAddress = null;
 
+        try
+        {
+            NetworkInterface[] networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
+
+            foreach (NetworkInterface networkInterface in networkInterfaces)
+            {
+                if (networkInterface.NetworkInterfaceType == NetworkInterfaceType.Loopback ||
+                    networkInterface.OperationalStatus != OperationalStatus.Up ||
+                    networkInterface.Description.ToLowerInvariant().Contains("virtual"))
+                {
+                    continue;
+                }
+
+                IPInterfaceProperties ipProperties = networkInterface.GetIPProperties();
+
+                foreach (UnicastIPAddressInformation unicastAddress in ipProperties.UnicastAddresses)
+                {
+                    if (unicastAddress.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork &&
+                        !IPAddress.IsLoopback(unicastAddress.Address) &&
+                        !IsLinkLocal(unicastAddress.Address))
+                    {
+                        localIpAddress = unicastAddress.Address.ToString();
+                        break;
+                    }
+                }
+
+                if (localIpAddress != null)
+                {
+                    break; // Found a valid IP address, break the loop
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting local IP address: {ex.Message}");
+        }
+
+        return localIpAddress;
+    }
+
+    private static bool IsLinkLocal(IPAddress address)
+    {
+        // Check if the address is in the range of link-local addresses (169.254.0.0 to 169.254.255.255)
+        byte[] bytes = address.GetAddressBytes();
+        return bytes[0] == 169 && bytes[1] == 254;
+    }
 
     public static void grade_data_code_2d(HTuple hv_DataCodeHandle, HTuple hv_ResultHandle,
         HTuple hv_Standard, HTuple hv_Format, HTuple hv_Mode, out HTuple hv_GradingResults)
