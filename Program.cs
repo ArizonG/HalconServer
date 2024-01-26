@@ -28,10 +28,16 @@ public class Program
     {
         var localIP = GetLocalIpAddress2();
         var cUrl = "http://" + localIP + ":8080";
+        string[] urls;
+        if(localIP == null || localIP.Length <1){
+            urls = ["http://localhost:8080"];
+        }else{
+            urls = ["http://localhost:8080", cUrl];
+        }
         Console.WriteLine(localIP + " : IP");
         var host = new WebHostBuilder()
             .UseKestrel()
-            .UseUrls("http://localhost:8080", cUrl)
+            .UseUrls(urls)
             .ConfigureServices(services => services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>().AddCors(options => options.AddPolicy("CorsPolicy",
                 builder => builder
                     .AllowAnyMethod()
