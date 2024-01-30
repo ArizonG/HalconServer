@@ -18,6 +18,7 @@ using System.Text.Json.Nodes;
 using Microsoft.VisualBasic;
 using System.Net.Sockets;
 using System.Net.NetworkInformation;
+using System.Numerics;
 
 
 public class Program
@@ -90,7 +91,7 @@ public class Program
                             //var json = JsonConvert.SerializeObject(jso);
                             context.Response.ContentType = "application/json";
 
-                            //File.Delete(filePath);
+                            File.Delete(filePath);
 
                             await context.Response.WriteAsync(json, Encoding.UTF8);
                         }
@@ -132,7 +133,7 @@ public class Program
                             //var json = JsonConvert.SerializeObject(jso);
                             context.Response.ContentType = "application/json";
 
-                            //File.Delete(filePath);
+                            File.Delete(filePath);
 
                             await context.Response.WriteAsync(json, Encoding.UTF8);
                         }
@@ -176,7 +177,7 @@ public class Program
                             //var json = JsonConvert.SerializeObject(jso);
                             context.Response.ContentType = "application/json";
 
-                            //File.Delete(filePath);
+                            File.Delete(filePath);
 
                             await context.Response.WriteAsync(json, Encoding.UTF8);
                         }
@@ -218,7 +219,65 @@ public class Program
                             //var json = JsonConvert.SerializeObject(jso);
                             context.Response.ContentType = "application/json";
 
-                            //File.Delete(filePath);
+                            File.Delete(filePath);
+
+                            await context.Response.WriteAsync(json, Encoding.UTF8);
+                        }
+                    }
+                    else 
+                    if (context.Request.Path == "/api/fileNorm")
+                    {
+                        // Console.WriteLine("Called2");
+                        // var file = context.Request.Form.Files[0];
+                        // var fileSize = file.Length;
+                        // Console.WriteLine("result : " + fileSize.ToString());
+                        // await context.Response.WriteAsync(fileSize.ToString() + "some");
+
+                        if (context.Request.Method == "POST")
+                        {
+                            var file = context.Request.Form.Files[0];
+                            var fileName = Path.GetRandomFileName();
+                            var filePath = Path.Combine(Directory.GetCurrentDirectory(), fileName + ".png");
+
+                            var file2 = context.Request.Form.Files[1];
+                            var fileName2 = Path.GetRandomFileName();
+                            var filePath2 = Path.Combine(Directory.GetCurrentDirectory(), fileName2 + ".png");
+
+                            using (var stream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await file.CopyToAsync(stream);
+                            }
+                            var fileSize = file.Length;
+
+                            using (var stream2 = new FileStream(filePath2, FileMode.Create))
+                            {
+                                await file2.CopyToAsync(stream2);
+                            }
+                            var fileSize2 = file2.Length;
+                            
+
+                            String jsx = ActionNorm(filePath, filePath2, false, false);
+                            //var jso = Action(filePath);
+                            // String jsx = (string)jso["grades"];
+                            // String decodeds = (string)jso["decoded"];
+                            // Console.WriteLine("Decoded: " + decoded);
+                            // Console.WriteLine("JSON  DATA : " + jsx);
+
+                            var fileInfo = new
+                            {
+                                FileName = fileName,
+                                FilePath = filePath,
+                                jsonData = jsx,
+                                decoded = decodedString
+                            };
+
+
+                            var json = JsonConvert.SerializeObject(fileInfo);
+                            //var json = JsonConvert.SerializeObject(jso);
+                            context.Response.ContentType = "application/json";
+
+                            File.Delete(filePath);
+                            File.Delete(filePath2);
 
                             await context.Response.WriteAsync(json, Encoding.UTF8);
                         }
@@ -1133,6 +1192,128 @@ public static string GetLocalIpAddress2()
             //  Console.WriteLine("DEDE");
             ho_Mat.Dispose();
             HOperatorSet.ReadImage(out ho_Mat, filepath);
+
+            hv_DataCodeHandle.Dispose();
+            HOperatorSet.CreateDataCode2dModel("Data Matrix ECC 200", new HTuple(), new HTuple(),
+                out hv_DataCodeHandle);
+            //  Console.WriteLine("DEDE2");
+
+            ho_SymbolXLDs.Dispose(); hv_ResultHandles.Dispose(); hv_DecodedDataStrings.Dispose();
+            if(useContrast){
+                HOperatorSet.GetImageSize(ho_Mat,out Width,out Height);
+            HOperatorSet.Emphasize(ho_Mat,out ho_ImageEmphasize, Width, Height, 2);
+            if(isRplane){
+                HOperatorSet.Decompose3(ho_ImageEmphasize, out _, out _, out rPlane);
+                HOperatorSet.FindDataCode2d(rPlane, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
+                new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
+            }else{
+                HOperatorSet.FindDataCode2d(ho_ImageEmphasize, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
+                new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
+            }
+            }else{
+                if(isRplane){
+                            
+                HOperatorSet.Decompose3(ho_Mat, out _, out _, out rPlane);
+                HOperatorSet.FindDataCode2d(rPlane, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
+                new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
+            }else{
+                HOperatorSet.FindDataCode2d(ho_Mat, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
+                new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
+            }
+            }
+            
+            // Console.WriteLine("DED33E");
+            decodedString = hv_DecodedDataStrings.ToString();
+            Console.WriteLine("decoded: " + hv_DecodedDataStrings.ToString());
+
+
+            using (HDevDisposeHelper dh = new HDevDisposeHelper())
+            {
+                hv_GradingResults.Dispose();
+                grade_data_code_2d(hv_DataCodeHandle, hv_ResultHandles, "isoiec15415",
+                    "numeric", "grades", out hv_GradingResults);
+            }
+
+            hv_JsonString.Dispose();
+            HOperatorSet.DictToJson(hv_GradingResults, new HTuple(), new HTuple(), out hv_JsonString);
+            //  Console.WriteLine("JSN: " + hv_JsonString.ToString());
+            // Console.WriteLine("DEDE55");
+                       //    Console.WriteLine("DEDE44 " + hv_JsonString.ToString());
+
+
+            // var jso = new
+            // {
+            //     decoded = hv_DecodedDataStrings.ToString(),
+            //     jsonData = hv_JsonString.ToString()
+            // };
+            // return jso;
+            // decodedString = hv_DecodedDataStrings.ToString();
+
+            return hv_JsonString;
+        }
+        catch (HalconException HDevExpDefaultException)
+        {
+            ho_Mat.Dispose();
+            ho_SymbolXLDs.Dispose();
+
+            hv_DataCodeHandle.Dispose();
+            hv_ResultHandles.Dispose();
+            hv_DecodedDataStrings.Dispose();
+            hv_GradingResults.Dispose();
+            hv_JsonString.Dispose();
+
+            //  throw HDevExpDefaultException;
+            Console.WriteLine(HDevExpDefaultException.ToString());
+
+            decodedString = "";
+            // var jso = new
+            // {
+            //     decoded = "NA",
+            //     jsonData = "NA"
+            // };
+            // return jso;
+            return "NA";
+        }
+        ho_Mat.Dispose();
+        ho_SymbolXLDs.Dispose();
+
+        hv_DataCodeHandle.Dispose();
+        hv_ResultHandles.Dispose();
+        hv_DecodedDataStrings.Dispose();
+        hv_GradingResults.Dispose();
+        hv_JsonString.Dispose();
+
+    }
+
+public static String ActionNorm(String filepath, String filepath2, Boolean isRplane, Boolean useContrast)
+    {
+        // Local iconic variables 
+     //   Console.WriteLine("HERE");
+
+        HObject ho_Mat, ho_SymbolXLDs, rPlane, ho_ImageEmphasize;
+        HTuple Width, Height;
+
+        // Local control variables 
+        HTuple h1, h2, w1, w2;
+                            HObject mat1, mat2, mat3;
+                            
+
+        HTuple hv_DataCodeHandle = new HTuple(), hv_ResultHandles = new HTuple();
+        HTuple hv_DecodedDataStrings = new HTuple(), hv_GradingResults = new HTuple();
+        HTuple hv_JsonString = new HTuple();
+        // Initialize local and output iconic variables 
+        HOperatorSet.GenEmptyObj(out ho_Mat);
+        HOperatorSet.GenEmptyObj(out ho_SymbolXLDs);
+        try
+        {
+            //  Console.WriteLine("DEDE");
+            ho_Mat.Dispose();
+          //  HOperatorSet.ReadImage(out ho_Mat, filepath);
+            HOperatorSet.ReadImage(out mat1, filepath);
+                            HOperatorSet.ReadImage(out mat2, filepath2);
+                            HOperatorSet.GetImageSize(mat1, out w1, out h1);
+                            HOperatorSet.GetImageSize(mat2, out w2, out h2);
+                            HOperatorSet.MultImage(mat1, mat2, out ho_Mat, 0.01, 0);
 
             hv_DataCodeHandle.Dispose();
             HOperatorSet.CreateDataCode2dModel("Data Matrix ECC 200", new HTuple(), new HTuple(),
