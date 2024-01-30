@@ -31,9 +31,12 @@ public class Program
         var localIP = GetLocalIpAddress2();
         var cUrl = "http://" + localIP + ":8080";
         string[] urls;
-        if(localIP == null || localIP.Length <1){
+        if (localIP == null || localIP.Length < 1)
+        {
             urls = ["http://localhost:8080"];
-        }else{
+        }
+        else
+        {
             urls = ["http://localhost:8080", cUrl];
         }
         Console.WriteLine(localIP + " : IP");
@@ -98,7 +101,7 @@ public class Program
                     }
                     else if (context.Request.Path == "/api/fileR")
                     {
-                       
+
 
                         if (context.Request.Method == "POST")
                         {
@@ -123,6 +126,68 @@ public class Program
                                 FileName = fileName,
                                 FilePath = filePath,
                                 jsonData = jsx,
+                                decoded = decodedString
+                            };
+
+                            //  Console.WriteLine(decodedString + ": DEDE");
+                            // Console.WriteLine(fileInfo.ToString());
+
+                            var json = JsonConvert.SerializeObject(fileInfo);
+                            //var json = JsonConvert.SerializeObject(jso);
+                            context.Response.ContentType = "application/json";
+
+                            File.Delete(filePath);
+
+                            await context.Response.WriteAsync(json, Encoding.UTF8);
+                        }
+                    }
+                    else if (context.Request.Path == "/api/fileCopy")
+                    {
+
+
+                        if (context.Request.Method == "POST")
+                        {
+                            var file = context.Request.Form.Files[0];
+                            var fileName = Path.GetRandomFileName();
+                            var filePath = Path.Combine(Directory.GetCurrentDirectory(), fileName + ".png");
+
+                            using (var stream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await file.CopyToAsync(stream);
+                            }
+                            var file2 = context.Request.Form.Files[0];
+                            var fileName2 = Path.GetRandomFileName();
+                            var filePath2 = Path.Combine(Directory.GetCurrentDirectory(), fileName2 + ".png");
+
+                            using (var stream = new FileStream(filePath2, FileMode.Create))
+                            {
+                                await file2.CopyToAsync(stream);
+                            }
+                            var file3 = context.Request.Form.Files[0];
+                            var fileName3 = Path.GetRandomFileName();
+                            var filePath3 = Path.Combine(Directory.GetCurrentDirectory(), fileName3 + ".png");
+
+                            using (var stream = new FileStream(filePath3, FileMode.Create))
+                            {
+                                await file3.CopyToAsync(stream);
+                            }
+                            var fileSize = file.Length;
+                            String jsx1 = Action(filePath, false, true);
+                            String jsx2 = Action(filePath2, false, true);
+                            String jsx3 = Action(filePath3, false, true);
+                            //var jso = Action(filePath);
+                            // String jsx = (string)jso["grades"];
+                            // String decodeds = (string)jso["decoded"];
+                            // Console.WriteLine("Decoded: " + decoded);
+                            // Console.WriteLine("JSON  DATA : " + jsx);
+                            
+                            var fileInfo = new
+                            {
+                                FileName = fileName,
+                                FilePath = filePath,
+                                jsonData = jsx1,
+                                jsonData2 = jsx2,
+                                jsonData3 = jsx3,
                                 decoded = decodedString
                             };
 
@@ -184,7 +249,7 @@ public class Program
                     }
                     else if (context.Request.Path == "/api/fileRCon")
                     {
-                       
+
 
                         if (context.Request.Method == "POST")
                         {
@@ -224,7 +289,7 @@ public class Program
                             await context.Response.WriteAsync(json, Encoding.UTF8);
                         }
                     }
-                    else 
+                    else
                     if (context.Request.Path == "/api/fileNorm")
                     {
                         // Console.WriteLine("Called2");
@@ -254,7 +319,7 @@ public class Program
                                 await file2.CopyToAsync(stream2);
                             }
                             var fileSize2 = file2.Length;
-                            
+
 
                             String jsx = ActionNorm(filePath, filePath2, false, false);
                             //var jso = Action(filePath);
@@ -349,7 +414,7 @@ public class Program
         await host.RunAsync();
     }
 
-public static string GetLocalIpAddress2()
+    public static string GetLocalIpAddress2()
     {
         string localIpAddress = null;
 
@@ -1174,7 +1239,7 @@ public static string GetLocalIpAddress2()
     public static String Action(String filepath, Boolean isRplane, Boolean useContrast)
     {
         // Local iconic variables 
-     //   Console.WriteLine("HERE");
+        //   Console.WriteLine("HERE");
 
         HObject ho_Mat, ho_SymbolXLDs, rPlane, ho_ImageEmphasize;
         HTuple Width, Height;
@@ -1199,29 +1264,38 @@ public static string GetLocalIpAddress2()
             //  Console.WriteLine("DEDE2");
 
             ho_SymbolXLDs.Dispose(); hv_ResultHandles.Dispose(); hv_DecodedDataStrings.Dispose();
-            if(useContrast){
-                HOperatorSet.GetImageSize(ho_Mat,out Width,out Height);
-            HOperatorSet.Emphasize(ho_Mat,out ho_ImageEmphasize, Width, Height, 2);
-            if(isRplane){
-                HOperatorSet.Decompose3(ho_ImageEmphasize, out _, out _, out rPlane);
-                HOperatorSet.FindDataCode2d(rPlane, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
-                new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
-            }else{
-                HOperatorSet.FindDataCode2d(ho_ImageEmphasize, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
-                new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
+            if (useContrast)
+            {
+                HOperatorSet.GetImageSize(ho_Mat, out Width, out Height);
+                HOperatorSet.Emphasize(ho_Mat, out ho_ImageEmphasize, Width, Height, 2);
+                if (isRplane)
+                {
+                    HOperatorSet.Decompose3(ho_ImageEmphasize, out _, out _, out rPlane);
+                    HOperatorSet.FindDataCode2d(rPlane, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
+                    new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
+                }
+                else
+                {
+                    HOperatorSet.FindDataCode2d(ho_ImageEmphasize, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
+                    new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
+                }
             }
-            }else{
-                if(isRplane){
-                            
-                HOperatorSet.Decompose3(ho_Mat, out _, out _, out rPlane);
-                HOperatorSet.FindDataCode2d(rPlane, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
-                new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
-            }else{
-                HOperatorSet.FindDataCode2d(ho_Mat, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
-                new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
+            else
+            {
+                if (isRplane)
+                {
+
+                    HOperatorSet.Decompose3(ho_Mat, out _, out _, out rPlane);
+                    HOperatorSet.FindDataCode2d(rPlane, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
+                    new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
+                }
+                else
+                {
+                    HOperatorSet.FindDataCode2d(ho_Mat, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
+                    new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
+                }
             }
-            }
-            
+
             // Console.WriteLine("DED33E");
             decodedString = hv_DecodedDataStrings.ToString();
             Console.WriteLine("decoded: " + hv_DecodedDataStrings.ToString());
@@ -1238,7 +1312,7 @@ public static string GetLocalIpAddress2()
             HOperatorSet.DictToJson(hv_GradingResults, new HTuple(), new HTuple(), out hv_JsonString);
             //  Console.WriteLine("JSN: " + hv_JsonString.ToString());
             // Console.WriteLine("DEDE55");
-                       //    Console.WriteLine("DEDE44 " + hv_JsonString.ToString());
+            //    Console.WriteLine("DEDE44 " + hv_JsonString.ToString());
 
 
             // var jso = new
@@ -1285,18 +1359,18 @@ public static string GetLocalIpAddress2()
 
     }
 
-public static String ActionNorm(String filepath, String filepath2, Boolean isRplane, Boolean useContrast)
+    public static String ActionNorm(String filepath, String filepath2, Boolean isRplane, Boolean useContrast)
     {
         // Local iconic variables 
-     //   Console.WriteLine("HERE");
+        //   Console.WriteLine("HERE");
 
         HObject ho_Mat, ho_SymbolXLDs, rPlane, ho_ImageEmphasize;
         HTuple Width, Height;
 
         // Local control variables 
         HTuple h1, h2, w1, w2;
-                            HObject mat1, mat2, mat3;
-                            
+        HObject mat1, mat2, mat3;
+
 
         HTuple hv_DataCodeHandle = new HTuple(), hv_ResultHandles = new HTuple();
         HTuple hv_DecodedDataStrings = new HTuple(), hv_GradingResults = new HTuple();
@@ -1308,12 +1382,12 @@ public static String ActionNorm(String filepath, String filepath2, Boolean isRpl
         {
             //  Console.WriteLine("DEDE");
             ho_Mat.Dispose();
-          //  HOperatorSet.ReadImage(out ho_Mat, filepath);
+            //  HOperatorSet.ReadImage(out ho_Mat, filepath);
             HOperatorSet.ReadImage(out mat1, filepath);
-                            HOperatorSet.ReadImage(out mat2, filepath2);
-                            HOperatorSet.GetImageSize(mat1, out w1, out h1);
-                            HOperatorSet.GetImageSize(mat2, out w2, out h2);
-                            HOperatorSet.MultImage(mat1, mat2, out ho_Mat, 0.01, 0);
+            HOperatorSet.ReadImage(out mat2, filepath2);
+            HOperatorSet.GetImageSize(mat1, out w1, out h1);
+            HOperatorSet.GetImageSize(mat2, out w2, out h2);
+            HOperatorSet.MultImage(mat1, mat2, out ho_Mat, 0.01, 0);
 
             hv_DataCodeHandle.Dispose();
             HOperatorSet.CreateDataCode2dModel("Data Matrix ECC 200", new HTuple(), new HTuple(),
@@ -1321,29 +1395,38 @@ public static String ActionNorm(String filepath, String filepath2, Boolean isRpl
             //  Console.WriteLine("DEDE2");
 
             ho_SymbolXLDs.Dispose(); hv_ResultHandles.Dispose(); hv_DecodedDataStrings.Dispose();
-            if(useContrast){
-                HOperatorSet.GetImageSize(ho_Mat,out Width,out Height);
-            HOperatorSet.Emphasize(ho_Mat,out ho_ImageEmphasize, Width, Height, 2);
-            if(isRplane){
-                HOperatorSet.Decompose3(ho_ImageEmphasize, out _, out _, out rPlane);
-                HOperatorSet.FindDataCode2d(rPlane, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
-                new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
-            }else{
-                HOperatorSet.FindDataCode2d(ho_ImageEmphasize, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
-                new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
+            if (useContrast)
+            {
+                HOperatorSet.GetImageSize(ho_Mat, out Width, out Height);
+                HOperatorSet.Emphasize(ho_Mat, out ho_ImageEmphasize, Width, Height, 2);
+                if (isRplane)
+                {
+                    HOperatorSet.Decompose3(ho_ImageEmphasize, out _, out _, out rPlane);
+                    HOperatorSet.FindDataCode2d(rPlane, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
+                    new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
+                }
+                else
+                {
+                    HOperatorSet.FindDataCode2d(ho_ImageEmphasize, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
+                    new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
+                }
             }
-            }else{
-                if(isRplane){
-                            
-                HOperatorSet.Decompose3(ho_Mat, out _, out _, out rPlane);
-                HOperatorSet.FindDataCode2d(rPlane, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
-                new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
-            }else{
-                HOperatorSet.FindDataCode2d(ho_Mat, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
-                new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
+            else
+            {
+                if (isRplane)
+                {
+
+                    HOperatorSet.Decompose3(ho_Mat, out _, out _, out rPlane);
+                    HOperatorSet.FindDataCode2d(rPlane, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
+                    new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
+                }
+                else
+                {
+                    HOperatorSet.FindDataCode2d(ho_Mat, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
+                    new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
+                }
             }
-            }
-            
+
             // Console.WriteLine("DED33E");
             decodedString = hv_DecodedDataStrings.ToString();
             Console.WriteLine("decoded: " + hv_DecodedDataStrings.ToString());
@@ -1360,7 +1443,7 @@ public static String ActionNorm(String filepath, String filepath2, Boolean isRpl
             HOperatorSet.DictToJson(hv_GradingResults, new HTuple(), new HTuple(), out hv_JsonString);
             //  Console.WriteLine("JSN: " + hv_JsonString.ToString());
             // Console.WriteLine("DEDE55");
-                       //    Console.WriteLine("DEDE44 " + hv_JsonString.ToString());
+            //    Console.WriteLine("DEDE44 " + hv_JsonString.ToString());
 
 
             // var jso = new
@@ -1407,51 +1490,52 @@ public static String ActionNorm(String filepath, String filepath2, Boolean isRpl
 
     }
 
-  public static String GetBarCodeData(String filepath)
-  {
 
-    // Local iconic variables 
+    public static String GetBarCodeData(String filepath)
+    {
 
-    HObject ho_Image, ho_SymbolRegions;
+        // Local iconic variables 
 
-    // Local control variables 
+        HObject ho_Image, ho_SymbolRegions;
 
-    HTuple hv_BarCodeHandle = new HTuple(), hv_DecodedDataStrings = new HTuple();
-    HTuple hv_Labels = new HTuple(), hv_Grades = new HTuple();
-    // Initialize local and output iconic variables 
-    HOperatorSet.GenEmptyObj(out ho_Image);
-    HOperatorSet.GenEmptyObj(out ho_SymbolRegions);
-    ho_Image.Dispose();
-    HOperatorSet.ReadImage(out ho_Image, filepath);
+        // Local control variables 
 
-    hv_BarCodeHandle.Dispose();
-    HOperatorSet.CreateBarCodeModel(new HTuple(), new HTuple(), out hv_BarCodeHandle);
-    HOperatorSet.SetBarCodeParam(hv_BarCodeHandle, "persistence", 1);
-    ho_SymbolRegions.Dispose();hv_DecodedDataStrings.Dispose();
-    HOperatorSet.FindBarCode(ho_Image, out ho_SymbolRegions, hv_BarCodeHandle, "auto", 
-        out hv_DecodedDataStrings);
-Console.WriteLine("Decoded" + hv_DecodedDataStrings.ToString());
+        HTuple hv_BarCodeHandle = new HTuple(), hv_DecodedDataStrings = new HTuple();
+        HTuple hv_Labels = new HTuple(), hv_Grades = new HTuple();
+        // Initialize local and output iconic variables 
+        HOperatorSet.GenEmptyObj(out ho_Image);
+        HOperatorSet.GenEmptyObj(out ho_SymbolRegions);
+        ho_Image.Dispose();
+        HOperatorSet.ReadImage(out ho_Image, filepath);
+
+        hv_BarCodeHandle.Dispose();
+        HOperatorSet.CreateBarCodeModel(new HTuple(), new HTuple(), out hv_BarCodeHandle);
+        HOperatorSet.SetBarCodeParam(hv_BarCodeHandle, "persistence", 1);
+        ho_SymbolRegions.Dispose(); hv_DecodedDataStrings.Dispose();
+        HOperatorSet.FindBarCode(ho_Image, out ho_SymbolRegions, hv_BarCodeHandle, "auto",
+            out hv_DecodedDataStrings);
+        Console.WriteLine("Decoded" + hv_DecodedDataStrings.ToString());
         barCodeString = hv_DecodedDataStrings.ToString();
 
-    hv_Labels.Dispose();
-    HOperatorSet.GetBarCodeResult(hv_BarCodeHandle, 0, "quality_isoiec15416_labels", 
-        out hv_Labels);
-    hv_Grades.Dispose();
-    HOperatorSet.GetBarCodeResult(hv_BarCodeHandle, 0, "quality_isoiec15416_float_grades", 
-        out hv_Grades);
-       
-    return hv_Grades.ToString();
+        hv_Labels.Dispose();
+        HOperatorSet.GetBarCodeResult(hv_BarCodeHandle, 0, "quality_isoiec15416_labels",
+            out hv_Labels);
+        hv_Grades.Dispose();
+        HOperatorSet.GetBarCodeResult(hv_BarCodeHandle, 0, "quality_isoiec15416_float_grades",
+            out hv_Grades);
+
+        return hv_Grades.ToString();
 
 
-    ho_Image.Dispose();
-    ho_SymbolRegions.Dispose();
+        ho_Image.Dispose();
+        ho_SymbolRegions.Dispose();
 
-    hv_BarCodeHandle.Dispose();
-    hv_DecodedDataStrings.Dispose();
-    hv_Labels.Dispose();
-    hv_Grades.Dispose();
+        hv_BarCodeHandle.Dispose();
+        hv_DecodedDataStrings.Dispose();
+        hv_Labels.Dispose();
+        hv_Grades.Dispose();
 
-  }
+    }
 
     // Main procedure 
     private static void action()
