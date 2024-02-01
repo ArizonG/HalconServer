@@ -66,22 +66,22 @@ public class Program
 
                         if (context.Request.Method == "POST")
                         {
-                            var formCollection = await context.Request.ReadFormAsync();
+                         //   var formCollection = await context.Request.ReadFormAsync();
                             var file = context.Request.Form.Files[0];
-                            var data = formCollection["data"];
-                            // Convert the JSON string to a JObject
-                            JObject jsonObject = JObject.Parse(data);
+                            // var data = formCollection["data"];
+                            // // Convert the JSON string to a JObject
+                            // JObject jsonObject = JObject.Parse(data);
 
-                            // Access individual items
-                            string name = (string)jsonObject["name"];
-                            int age = (int)jsonObject["coeff"];
-                            string city = (string)jsonObject["value"];
+                            // // Access individual items
+                            // string name = (string)jsonObject["name"];
+                            // int age = (int)jsonObject["coeff"];
+                            // string city = (string)jsonObject["value"];
 
-                            // Display the extracted items
-                            Console.WriteLine($"Name: {name}");
-                            Console.WriteLine($"Age: {age}");
-                            Console.WriteLine($"City: {city}");
-                            Console.WriteLine(data.ToString());
+                            // // Display the extracted items
+                            // Console.WriteLine($"Name: {name}");
+                            // Console.WriteLine($"Age: {age}");
+                            // Console.WriteLine($"City: {city}");
+                            // Console.WriteLine(data.ToString());
                             var fileName = Path.GetRandomFileName();
                             var filePath = Path.Combine(Directory.GetCurrentDirectory(), fileName + ".png");
 
@@ -196,7 +196,7 @@ public class Program
                             // String decodeds = (string)jso["decoded"];
                             // Console.WriteLine("Decoded: " + decoded);
                             // Console.WriteLine("JSON  DATA : " + jsx);
-
+                            
                             var fileInfo = new
                             {
                                 FileName = fileName,
