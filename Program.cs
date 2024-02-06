@@ -66,22 +66,23 @@ public class Program
 
                         if (context.Request.Method == "POST")
                         {
-                         //   var formCollection = await context.Request.ReadFormAsync();
+
+                            var formCollection = await context.Request.ReadFormAsync();
                             var file = context.Request.Form.Files[0];
-                            // var data = formCollection["data"];
-                            // // Convert the JSON string to a JObject
-                            // JObject jsonObject = JObject.Parse(data);
+                            var data = formCollection["data"];
+                            // Convert the JSON string to a JObject
+                            JObject jsonObject = JObject.Parse(data);
 
-                            // // Access individual items
-                            // string name = (string)jsonObject["name"];
-                            // int age = (int)jsonObject["coeff"];
-                            // string city = (string)jsonObject["value"];
+                            // Access individual items
+                            Boolean rplane = (Boolean)jsonObject["rplane"];
+                            float multi_factor = (float)jsonObject["multi_factor"];
+                            Boolean contrast = (Boolean)jsonObject["contrast"];
 
-                            // // Display the extracted items
-                            // Console.WriteLine($"Name: {name}");
-                            // Console.WriteLine($"Age: {age}");
-                            // Console.WriteLine($"City: {city}");
-                            // Console.WriteLine(data.ToString());
+                            // Display the extracted items
+                            Console.WriteLine($"rplane: {rplane}");
+                            Console.WriteLine($"multi_factor: {multi_factor}");
+                            Console.WriteLine($"contrast: {contrast}");
+                            //  Console.WriteLine(data.ToString());
                             var fileName = Path.GetRandomFileName();
                             var filePath = Path.Combine(Directory.GetCurrentDirectory(), fileName + ".png");
 
@@ -90,12 +91,12 @@ public class Program
                                 await file.CopyToAsync(stream);
                             }
                             var fileSize = file.Length;
-                            String jsx = Action(filePath, false, false);
+                            String jsx = Action(filePath, rplane, contrast);
                             //var jso = Action(filePath);
                             // String jsx = (string)jso["grades"];
                             // String decodeds = (string)jso["decoded"];
                             // Console.WriteLine("Decoded: " + decoded);
-                            // Console.WriteLine("JSON  DATA : " + jsx);
+                            Console.WriteLine("JSON  DATA : " + jsx);
 
                             var fileInfo = new
                             {
@@ -110,49 +111,7 @@ public class Program
                             //var json = JsonConvert.SerializeObject(jso);
                             context.Response.ContentType = "application/json";
 
-                            File.Delete(filePath);
-
-                            await context.Response.WriteAsync(json, Encoding.UTF8);
-                        }
-                    }
-                    else if (context.Request.Path == "/api/fileR")
-                    {
-
-
-                        if (context.Request.Method == "POST")
-                        {
-                            var file = context.Request.Form.Files[0];
-                            var fileName = Path.GetRandomFileName();
-                            var filePath = Path.Combine(Directory.GetCurrentDirectory(), fileName + ".png");
-
-                            using (var stream = new FileStream(filePath, FileMode.Create))
-                            {
-                                await file.CopyToAsync(stream);
-                            }
-                            var fileSize = file.Length;
-                            String jsx = Action(filePath, true, false);
-                            //var jso = Action(filePath);
-                            // String jsx = (string)jso["grades"];
-                            // String decodeds = (string)jso["decoded"];
-                            // Console.WriteLine("Decoded: " + decoded);
-                            // Console.WriteLine("JSON  DATA : " + jsx);
-
-                            var fileInfo = new
-                            {
-                                FileName = fileName,
-                                FilePath = filePath,
-                                jsonData = jsx,
-                                decoded = decodedString
-                            };
-
-                            //  Console.WriteLine(decodedString + ": DEDE");
-                            // Console.WriteLine(fileInfo.ToString());
-
-                            var json = JsonConvert.SerializeObject(fileInfo);
-                            //var json = JsonConvert.SerializeObject(jso);
-                            context.Response.ContentType = "application/json";
-
-                            File.Delete(filePath);
+                            //File.Delete(filePath);
 
                             await context.Response.WriteAsync(json, Encoding.UTF8);
                         }
@@ -163,6 +122,20 @@ public class Program
 
                         if (context.Request.Method == "POST")
                         {
+                            var formCollection = await context.Request.ReadFormAsync();
+                            var data = formCollection["data"];
+                            // Convert the JSON string to a JObject
+                            JObject jsonObject = JObject.Parse(data);
+
+                            // Access individual items
+                            Boolean rplane = (Boolean)jsonObject["rplane"];
+                            float multi_factor = (float)jsonObject["multi_factor"];
+                            Boolean contrast = (Boolean)jsonObject["contrast"];
+
+                            // Display the extracted items
+                            Console.WriteLine($"rplane: {rplane}");
+                            Console.WriteLine($"multi_factor: {multi_factor}");
+                            Console.WriteLine($"contrast: {contrast}");
                             var file = context.Request.Form.Files[0];
                             var fileName = Path.GetRandomFileName();
                             var filePath = Path.Combine(Directory.GetCurrentDirectory(), fileName + ".png");
@@ -188,15 +161,15 @@ public class Program
                                 await file3.CopyToAsync(stream);
                             }
                             var fileSize = file.Length;
-                            String jsx1 = Action(filePath, false, true);
-                            String jsx2 = Action(filePath2, false, true);
-                            String jsx3 = Action(filePath3, false, true);
+                            String jsx1 = Action(filePath, rplane, contrast);
+                            String jsx2 = Action(filePath, rplane, contrast);
+                            String jsx3 = Action(filePath, rplane, contrast);
                             //var jso = Action(filePath);
                             // String jsx = (string)jso["grades"];
                             // String decodeds = (string)jso["decoded"];
                             // Console.WriteLine("Decoded: " + decoded);
                             // Console.WriteLine("JSON  DATA : " + jsx);
-                            
+
                             var fileInfo = new
                             {
                                 FileName = fileName,
@@ -215,92 +188,8 @@ public class Program
                             context.Response.ContentType = "application/json";
 
                             File.Delete(filePath);
-
-                            await context.Response.WriteAsync(json, Encoding.UTF8);
-                        }
-                    }
-                    else if (context.Request.Path == "/api/fileCon")
-                    {
-                        // Console.WriteLine("Called2");
-                        // var file = context.Request.Form.Files[0];
-                        // var fileSize = file.Length;
-                        // Console.WriteLine("result : " + fileSize.ToString());
-                        // await context.Response.WriteAsync(fileSize.ToString() + "some");
-
-                        if (context.Request.Method == "POST")
-                        {
-                            var file = context.Request.Form.Files[0];
-                            var fileName = Path.GetRandomFileName();
-                            var filePath = Path.Combine(Directory.GetCurrentDirectory(), fileName + ".png");
-
-                            using (var stream = new FileStream(filePath, FileMode.Create))
-                            {
-                                await file.CopyToAsync(stream);
-                            }
-                            var fileSize = file.Length;
-                            String jsx = Action(filePath, false, true);
-                            //var jso = Action(filePath);
-                            // String jsx = (string)jso["grades"];
-                            // String decodeds = (string)jso["decoded"];
-                            // Console.WriteLine("Decoded: " + decoded);
-                            // Console.WriteLine("JSON  DATA : " + jsx);
-
-                            var fileInfo = new
-                            {
-                                FileName = fileName,
-                                FilePath = filePath,
-                                jsonData = jsx,
-                                decoded = decodedString
-                            };
-
-
-                            var json = JsonConvert.SerializeObject(fileInfo);
-                            //var json = JsonConvert.SerializeObject(jso);
-                            context.Response.ContentType = "application/json";
-
-                            File.Delete(filePath);
-
-                            await context.Response.WriteAsync(json, Encoding.UTF8);
-                        }
-                    }
-                    else if (context.Request.Path == "/api/fileRCon")
-                    {
-
-
-                        if (context.Request.Method == "POST")
-                        {
-                            var file = context.Request.Form.Files[0];
-                            var fileName = Path.GetRandomFileName();
-                            var filePath = Path.Combine(Directory.GetCurrentDirectory(), fileName + ".png");
-
-                            using (var stream = new FileStream(filePath, FileMode.Create))
-                            {
-                                await file.CopyToAsync(stream);
-                            }
-                            var fileSize = file.Length;
-                            String jsx = Action(filePath, true, true);
-                            //var jso = Action(filePath);
-                            // String jsx = (string)jso["grades"];
-                            // String decodeds = (string)jso["decoded"];
-                            // Console.WriteLine("Decoded: " + decoded);
-                            // Console.WriteLine("JSON  DATA : " + jsx);
-
-                            var fileInfo = new
-                            {
-                                FileName = fileName,
-                                FilePath = filePath,
-                                jsonData = jsx,
-                                decoded = decodedString
-                            };
-
-                            //  Console.WriteLine(decodedString + ": DEDE");
-                            // Console.WriteLine(fileInfo.ToString());
-
-                            var json = JsonConvert.SerializeObject(fileInfo);
-                            //var json = JsonConvert.SerializeObject(jso);
-                            context.Response.ContentType = "application/json";
-
-                            File.Delete(filePath);
+                            File.Delete(filePath2);
+                            File.Delete(filePath3);
 
                             await context.Response.WriteAsync(json, Encoding.UTF8);
                         }
@@ -308,14 +197,25 @@ public class Program
                     else
                     if (context.Request.Path == "/api/fileNorm")
                     {
-                        // Console.WriteLine("Called2");
-                        // var file = context.Request.Form.Files[0];
-                        // var fileSize = file.Length;
-                        // Console.WriteLine("result : " + fileSize.ToString());
-                        // await context.Response.WriteAsync(fileSize.ToString() + "some");
+
 
                         if (context.Request.Method == "POST")
                         {
+                            var formCollection = await context.Request.ReadFormAsync();
+                            var data = formCollection["data"];
+                            // Convert the JSON string to a JObject
+                            JObject jsonObject = JObject.Parse(data);
+
+                            // Access individual items
+                            Boolean rplane = (Boolean)jsonObject["rplane"];
+                            float multi_factor = (float)jsonObject["multi_factor"];
+                            Boolean contrast = (Boolean)jsonObject["contrast"];
+
+                            // Display the extracted items
+                            Console.WriteLine($"rplane: {rplane}");
+                            Console.WriteLine($"multi_factor: {multi_factor}");
+                            Console.WriteLine($"contrast: {contrast}");
+
                             var file = context.Request.Form.Files[0];
                             var fileName = Path.GetRandomFileName();
                             var filePath = Path.Combine(Directory.GetCurrentDirectory(), fileName + ".png");
@@ -337,7 +237,7 @@ public class Program
                             var fileSize2 = file2.Length;
 
 
-                            String jsx = ActionNorm(filePath, filePath2, false, false);
+                            String jsx = ActionNorm(filePath, filePath2, rplane, contrast, multi_factor);
                             //var jso = Action(filePath);
                             // String jsx = (string)jso["grades"];
                             // String decodeds = (string)jso["decoded"];
@@ -365,7 +265,7 @@ public class Program
                     }
                     else if (context.Request.Path == "/api/barcode")
                     {
-                        // Console.WriteLine("Called2");
+                        Console.WriteLine("Called2");
                         // var file = context.Request.Form.Files[0];
                         // var fileSize = file.Length;
                         // Console.WriteLine("result : " + fileSize.ToString());
@@ -373,6 +273,22 @@ public class Program
 
                         if (context.Request.Method == "POST")
                         {
+                            var formCollection = await context.Request.ReadFormAsync();
+                            var data = formCollection["data"];
+                            // Convert the JSON string to a JObject
+                            JObject jsonObject = JObject.Parse(data);
+                            Console.WriteLine(jsonObject.ToString());
+
+                            // Access individual items
+                            Boolean rplane = (Boolean)jsonObject["rplane"];
+                            float multi_factor = (float)jsonObject["multi_factor"];
+                            Boolean contrast = (Boolean)jsonObject["contrast"];
+
+                            // Display the extracted items
+                            Console.WriteLine($"rplane: {rplane}");
+                            Console.WriteLine($"multi_factor: {multi_factor}");
+                            Console.WriteLine($"contrast: {contrast}");
+
                             var file = context.Request.Form.Files[0];
                             var fileName = Path.GetRandomFileName();
                             var filePath = Path.Combine(Directory.GetCurrentDirectory(), fileName + ".png");
@@ -382,7 +298,7 @@ public class Program
                                 await file.CopyToAsync(stream);
                             }
                             var fileSize = file.Length;
-                            String jsx = GetBarCodeData(filePath);
+                            String jsx = GetBarCodeData(filePath, rplane, contrast, multi_factor);
 
                             //var jso = Action(filePath);
                             // String jsx = (string)jso["grades"];
@@ -1257,7 +1173,7 @@ public class Program
         // Local iconic variables 
         //   Console.WriteLine("HERE");
 
-        HObject ho_Mat, ho_SymbolXLDs, rPlane, ho_ImageEmphasize;
+        HObject ho_Mat, ho_SymbolXLDs, rPlane, ho_ImageEmphasize, ho_gray;
         HTuple Width, Height;
 
         // Local control variables 
@@ -1280,37 +1196,27 @@ public class Program
             //  Console.WriteLine("DEDE2");
 
             ho_SymbolXLDs.Dispose(); hv_ResultHandles.Dispose(); hv_DecodedDataStrings.Dispose();
-            if (useContrast)
+            if (isRplane)
             {
-                HOperatorSet.GetImageSize(ho_Mat, out Width, out Height);
-                HOperatorSet.Emphasize(ho_Mat, out ho_ImageEmphasize, Width, Height, 2);
-                if (isRplane)
-                {
-                    HOperatorSet.Decompose3(ho_ImageEmphasize, out _, out _, out rPlane);
-                    HOperatorSet.FindDataCode2d(rPlane, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
-                    new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
-                }
-                else
-                {
-                    HOperatorSet.FindDataCode2d(ho_ImageEmphasize, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
-                    new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
-                }
+                HOperatorSet.Decompose3(ho_Mat, out _, out _, out ho_gray);
             }
             else
             {
-                if (isRplane)
-                {
-
-                    HOperatorSet.Decompose3(ho_Mat, out _, out _, out rPlane);
-                    HOperatorSet.FindDataCode2d(rPlane, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
-                    new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
-                }
-                else
-                {
-                    HOperatorSet.FindDataCode2d(ho_Mat, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
-                    new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
-                }
+                HOperatorSet.Rgb1ToGray(ho_Mat, out ho_gray);
             }
+            if (useContrast)
+            {
+                HOperatorSet.GetImageSize(ho_gray, out Width, out Height);
+                HOperatorSet.Emphasize(ho_gray, out ho_ImageEmphasize, Width, Height, 2);
+                HOperatorSet.FindDataCode2d(ho_ImageEmphasize, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
+                    new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
+            }
+            else
+            {
+                HOperatorSet.FindDataCode2d(ho_gray, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
+                new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
+            }
+
 
             // Console.WriteLine("DED33E");
             decodedString = hv_DecodedDataStrings.ToString();
@@ -1375,7 +1281,7 @@ public class Program
 
     }
 
-    public static String ActionNorm(String filepath, String filepath2, Boolean isRplane, Boolean useContrast)
+    public static String ActionNorm(String filewhite, String filepath2, Boolean isRplane, Boolean useContrast, float multi_factor)
     {
         // Local iconic variables 
         //   Console.WriteLine("HERE");
@@ -1385,7 +1291,7 @@ public class Program
 
         // Local control variables 
         HTuple h1, h2, w1, w2;
-        HObject mat1, mat2, mat3;
+        HObject mat1, mat2, mat3, gray1, gray2, invert1;
 
 
         HTuple hv_DataCodeHandle = new HTuple(), hv_ResultHandles = new HTuple();
@@ -1399,11 +1305,20 @@ public class Program
             //  Console.WriteLine("DEDE");
             ho_Mat.Dispose();
             //  HOperatorSet.ReadImage(out ho_Mat, filepath);
-            HOperatorSet.ReadImage(out mat1, filepath);
+            HOperatorSet.ReadImage(out mat1, filewhite);
             HOperatorSet.ReadImage(out mat2, filepath2);
-            HOperatorSet.GetImageSize(mat1, out w1, out h1);
-            HOperatorSet.GetImageSize(mat2, out w2, out h2);
-            HOperatorSet.MultImage(mat1, mat2, out ho_Mat, 0.01, 0);
+            if (isRplane)
+            {
+                HOperatorSet.Decompose3(mat1, out _, out _, out gray1);
+                HOperatorSet.Decompose3(mat2, out _, out _, out gray2);
+            }
+            else
+            {
+                HOperatorSet.Rgb1ToGray(mat1, out gray1);
+                HOperatorSet.Rgb1ToGray(mat2, out gray2);
+            }
+            HOperatorSet.InvertImage(gray1, out invert1);
+            HOperatorSet.MultImage(invert1, gray2, out ho_Mat, multi_factor, 0);
 
             hv_DataCodeHandle.Dispose();
             HOperatorSet.CreateDataCode2dModel("Data Matrix ECC 200", new HTuple(), new HTuple(),
@@ -1415,38 +1330,20 @@ public class Program
             {
                 HOperatorSet.GetImageSize(ho_Mat, out Width, out Height);
                 HOperatorSet.Emphasize(ho_Mat, out ho_ImageEmphasize, Width, Height, 2);
-                if (isRplane)
-                {
-                    HOperatorSet.Decompose3(ho_ImageEmphasize, out _, out _, out rPlane);
-                    HOperatorSet.FindDataCode2d(rPlane, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
+                HOperatorSet.FindDataCode2d(ho_ImageEmphasize, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
                     new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
-                }
-                else
-                {
-                    HOperatorSet.FindDataCode2d(ho_ImageEmphasize, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
-                    new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
-                }
+
             }
             else
             {
-                if (isRplane)
-                {
+                HOperatorSet.FindDataCode2d(ho_Mat, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
+                    new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
 
-                    HOperatorSet.Decompose3(ho_Mat, out _, out _, out rPlane);
-                    HOperatorSet.FindDataCode2d(rPlane, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
-                    new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
-                }
-                else
-                {
-                    HOperatorSet.FindDataCode2d(ho_Mat, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
-                    new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
-                }
             }
 
             // Console.WriteLine("DED33E");
             decodedString = hv_DecodedDataStrings.ToString();
             Console.WriteLine("decoded: " + hv_DecodedDataStrings.ToString());
-
 
             using (HDevDisposeHelper dh = new HDevDisposeHelper())
             {
@@ -1507,12 +1404,16 @@ public class Program
     }
 
 
-    public static String GetBarCodeData(String filepath)
+    public static String GetBarCodeData(String filepath, Boolean isRplane, Boolean useContrast, float multi_factor)
     {
+
+        Console.WriteLine("caeed");
 
         // Local iconic variables 
 
-        HObject ho_Image, ho_SymbolRegions;
+        HObject ho_Image, ho_SymbolRegions, ho_gray, ho_emph;
+
+        HTuple Width, Height;
 
         // Local control variables 
 
@@ -1528,8 +1429,41 @@ public class Program
         HOperatorSet.CreateBarCodeModel(new HTuple(), new HTuple(), out hv_BarCodeHandle);
         HOperatorSet.SetBarCodeParam(hv_BarCodeHandle, "persistence", 1);
         ho_SymbolRegions.Dispose(); hv_DecodedDataStrings.Dispose();
-        HOperatorSet.FindBarCode(ho_Image, out ho_SymbolRegions, hv_BarCodeHandle, "auto",
+        if (isRplane)
+        {
+            HOperatorSet.Decompose3(ho_Image, out _, out _, out ho_gray);
+            if (useContrast)
+            {
+                HOperatorSet.GetImageSize(ho_gray, out Width, out Height);
+                HOperatorSet.Emphasize(ho_gray, out ho_emph, Width, Height, 1);
+                HOperatorSet.FindBarCode(ho_emph, out ho_SymbolRegions, hv_BarCodeHandle, "auto",
+                            out hv_DecodedDataStrings);
+
+            }
+            else
+            {
+                HOperatorSet.FindBarCode(ho_gray, out ho_SymbolRegions, hv_BarCodeHandle, "auto",
             out hv_DecodedDataStrings);
+            }
+        }
+        else
+        {
+            HOperatorSet.Rgb1ToGray(ho_Image, out ho_gray);
+            if (useContrast)
+            {
+                HOperatorSet.GetImageSize(ho_gray, out Width, out Height);
+                HOperatorSet.Emphasize(ho_gray, out ho_emph, Width, Height, 1);
+                HOperatorSet.FindBarCode(ho_emph, out ho_SymbolRegions, hv_BarCodeHandle, "auto",
+                            out hv_DecodedDataStrings);
+            }
+            else
+            {
+                HOperatorSet.FindBarCode(ho_gray, out ho_SymbolRegions, hv_BarCodeHandle, "auto",
+                            out hv_DecodedDataStrings);
+            }
+
+        }
+
         Console.WriteLine("Decoded" + hv_DecodedDataStrings.ToString());
         barCodeString = hv_DecodedDataStrings.ToString();
 
