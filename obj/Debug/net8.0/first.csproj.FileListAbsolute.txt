@@ -62,7 +62,6 @@ C:\Users\DELL\Documents\Cprograms\first\obj\Debug\net8.0\first.GeneratedMSBuildE
 C:\Users\DELL\Documents\Cprograms\first\obj\Debug\net8.0\first.AssemblyInfoInputs.cache
 C:\Users\DELL\Documents\Cprograms\first\obj\Debug\net8.0\first.AssemblyInfo.cs
 C:\Users\DELL\Documents\Cprograms\first\obj\Debug\net8.0\first.csproj.CoreCompileInputs.cache
-C:\Users\DELL\Documents\Cprograms\first\obj\Debug\net8.0\first.csproj.CopyComplete
 C:\Users\DELL\Documents\Cprograms\first\obj\Debug\net8.0\first.dll
 C:\Users\DELL\Documents\Cprograms\first\obj\Debug\net8.0\refint\first.dll
 C:\Users\DELL\Documents\Cprograms\first\obj\Debug\net8.0\first.pdb
@@ -71,3 +70,4 @@ C:\Users\DELL\Documents\Cprograms\first\obj\Debug\net8.0\ref\first.dll
 C:\Users\DELL\Documents\Cprograms\first\bin\Debug\net8.0\Microsoft.AspNetCore.Cors.dll
 C:\Users\DELL\Documents\Cprograms\first\bin\Debug\net8.0\MVTec.HalconDotNet.dll
 C:\Users\DELL\Documents\Cprograms\first\obj\Debug\net8.0\first.sourcelink.json
+C:\Users\DELL\Documents\Cprograms\first\obj\Debug\net8.0\first.csproj.Up2Date

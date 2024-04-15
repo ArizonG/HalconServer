@@ -92,6 +92,9 @@ public class Program
                             }
                             var fileSize = file.Length;
                             String jsx = Action(filePath, rplane, contrast);
+                            String grades_main = Action1(filePath, rplane, contrast);
+                            String grades_inter = Action2(filePath, rplane, contrast);
+
                             //var jso = Action(filePath);
                             // String jsx = (string)jso["grades"];
                             // String decodeds = (string)jso["decoded"];
@@ -103,6 +106,8 @@ public class Program
                                 FileName = fileName,
                                 FilePath = filePath,
                                 jsonData = jsx,
+                                grades_main = grades_main,
+                                grades_inter = grades_inter,
                                 decoded = decodedString
                             };
 
@@ -1232,6 +1237,28 @@ public class Program
 
             hv_JsonString.Dispose();
             HOperatorSet.DictToJson(hv_GradingResults, new HTuple(), new HTuple(), out hv_JsonString);
+
+
+            HTuple hv_ResultValues2 = new HTuple();
+            HTuple hv_ResultValues4 = new HTuple();
+
+            using (HDevDisposeHelper dh = new HDevDisposeHelper())
+            {
+                hv_ResultValues2.Dispose();
+                HOperatorSet.GetDataCode2dResults(hv_DataCodeHandle, hv_ResultHandles.TupleSelect(
+                    0), "quality_isoiec15415", out hv_ResultValues2);
+            }
+            using (HDevDisposeHelper dh = new HDevDisposeHelper())
+            {
+                hv_ResultValues4.Dispose();
+                HOperatorSet.GetDataCode2dResults(hv_DataCodeHandle, hv_ResultHandles.TupleSelect(
+                    0), "quality_isoiec15415_intermediate", out hv_ResultValues4);
+            }
+            Console.WriteLine("Grades : " + hv_ResultValues2.ToString());
+            Console.WriteLine("Inter: " + hv_ResultValues4.ToString());
+
+
+
             //  Console.WriteLine("JSN: " + hv_JsonString.ToString());
             // Console.WriteLine("DEDE55");
             //    Console.WriteLine("DEDE44 " + hv_JsonString.ToString());
@@ -1246,6 +1273,275 @@ public class Program
             // decodedString = hv_DecodedDataStrings.ToString();
 
             return hv_JsonString;
+        }
+        catch (HalconException HDevExpDefaultException)
+        {
+            ho_Mat.Dispose();
+            ho_SymbolXLDs.Dispose();
+
+            hv_DataCodeHandle.Dispose();
+            hv_ResultHandles.Dispose();
+            hv_DecodedDataStrings.Dispose();
+            hv_GradingResults.Dispose();
+            hv_JsonString.Dispose();
+
+            //  throw HDevExpDefaultException;
+            Console.WriteLine(HDevExpDefaultException.ToString());
+
+            decodedString = "";
+            // var jso = new
+            // {
+            //     decoded = "NA",
+            //     jsonData = "NA"
+            // };
+            // return jso;
+            return "NA";
+        }
+        ho_Mat.Dispose();
+        ho_SymbolXLDs.Dispose();
+
+        hv_DataCodeHandle.Dispose();
+        hv_ResultHandles.Dispose();
+        hv_DecodedDataStrings.Dispose();
+        hv_GradingResults.Dispose();
+        hv_JsonString.Dispose();
+
+    }
+
+    public static String Action1(String filepath, Boolean isRplane, Boolean useContrast)
+    {
+        // Local iconic variables 
+        //   Console.WriteLine("HERE");
+
+        HObject ho_Mat, ho_SymbolXLDs, rPlane, ho_ImageEmphasize, ho_gray;
+        HTuple Width, Height;
+
+        // Local control variables 
+
+        HTuple hv_DataCodeHandle = new HTuple(), hv_ResultHandles = new HTuple();
+        HTuple hv_DecodedDataStrings = new HTuple(), hv_GradingResults = new HTuple();
+        HTuple hv_JsonString = new HTuple();
+        // Initialize local and output iconic variables 
+        HOperatorSet.GenEmptyObj(out ho_Mat);
+        HOperatorSet.GenEmptyObj(out ho_SymbolXLDs);
+        try
+        {
+            //  Console.WriteLine("DEDE");
+            ho_Mat.Dispose();
+            HOperatorSet.ReadImage(out ho_Mat, filepath);
+
+            hv_DataCodeHandle.Dispose();
+            HOperatorSet.CreateDataCode2dModel("Data Matrix ECC 200", new HTuple(), new HTuple(),
+                out hv_DataCodeHandle);
+            //  Console.WriteLine("DEDE2");
+
+            ho_SymbolXLDs.Dispose(); hv_ResultHandles.Dispose(); hv_DecodedDataStrings.Dispose();
+            if (isRplane)
+            {
+                HOperatorSet.Decompose3(ho_Mat, out _, out _, out ho_gray);
+            }
+            else
+            {
+                HOperatorSet.Rgb1ToGray(ho_Mat, out ho_gray);
+            }
+            if (useContrast)
+            {
+                HOperatorSet.GetImageSize(ho_gray, out Width, out Height);
+                HOperatorSet.Emphasize(ho_gray, out ho_ImageEmphasize, Width, Height, 2);
+                HOperatorSet.FindDataCode2d(ho_ImageEmphasize, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
+                    new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
+            }
+            else
+            {
+                HOperatorSet.FindDataCode2d(ho_gray, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
+                new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
+            }
+
+
+            // Console.WriteLine("DED33E");
+            decodedString = hv_DecodedDataStrings.ToString();
+            Console.WriteLine("decoded: " + hv_DecodedDataStrings.ToString());
+
+
+            using (HDevDisposeHelper dh = new HDevDisposeHelper())
+            {
+                hv_GradingResults.Dispose();
+                grade_data_code_2d(hv_DataCodeHandle, hv_ResultHandles, "isoiec15415",
+                    "numeric", "grades", out hv_GradingResults);
+            }
+
+            hv_JsonString.Dispose();
+            HOperatorSet.DictToJson(hv_GradingResults, new HTuple(), new HTuple(), out hv_JsonString);
+
+
+            HTuple hv_ResultValues2 = new HTuple();
+            HTuple hv_ResultValues4 = new HTuple();
+
+            using (HDevDisposeHelper dh = new HDevDisposeHelper())
+            {
+                hv_ResultValues2.Dispose();
+                HOperatorSet.GetDataCode2dResults(hv_DataCodeHandle, hv_ResultHandles.TupleSelect(
+                    0), "quality_isoiec15415", out hv_ResultValues2);
+            }
+            using (HDevDisposeHelper dh = new HDevDisposeHelper())
+            {
+                hv_ResultValues4.Dispose();
+                HOperatorSet.GetDataCode2dResults(hv_DataCodeHandle, hv_ResultHandles.TupleSelect(
+                    0), "quality_isoiec15415_intermediate", out hv_ResultValues4);
+            }
+            Console.WriteLine("Grades : " + hv_ResultValues2.ToString());
+            Console.WriteLine("Inter: " + hv_ResultValues4.ToString());
+
+
+
+            //  Console.WriteLine("JSN: " + hv_JsonString.ToString());
+            // Console.WriteLine("DEDE55");
+            //    Console.WriteLine("DEDE44 " + hv_JsonString.ToString());
+
+
+            // var jso = new
+            // {
+            //     decoded = hv_DecodedDataStrings.ToString(),
+            //     jsonData = hv_JsonString.ToString()
+            // };
+            // return jso;
+            // decodedString = hv_DecodedDataStrings.ToString();
+
+            return hv_ResultValues2.ToString();
+        }
+        catch (HalconException HDevExpDefaultException)
+        {
+            ho_Mat.Dispose();
+            ho_SymbolXLDs.Dispose();
+
+            hv_DataCodeHandle.Dispose();
+            hv_ResultHandles.Dispose();
+            hv_DecodedDataStrings.Dispose();
+            hv_GradingResults.Dispose();
+            hv_JsonString.Dispose();
+
+            //  throw HDevExpDefaultException;
+            Console.WriteLine(HDevExpDefaultException.ToString());
+
+            decodedString = "";
+            // var jso = new
+            // {
+            //     decoded = "NA",
+            //     jsonData = "NA"
+            // };
+            // return jso;
+            return "NA";
+        }
+        ho_Mat.Dispose();
+        ho_SymbolXLDs.Dispose();
+
+        hv_DataCodeHandle.Dispose();
+        hv_ResultHandles.Dispose();
+        hv_DecodedDataStrings.Dispose();
+        hv_GradingResults.Dispose();
+        hv_JsonString.Dispose();
+
+    }
+    public static String Action2(String filepath, Boolean isRplane, Boolean useContrast)
+    {
+        // Local iconic variables 
+        //   Console.WriteLine("HERE");
+
+        HObject ho_Mat, ho_SymbolXLDs, rPlane, ho_ImageEmphasize, ho_gray;
+        HTuple Width, Height;
+
+        // Local control variables 
+
+        HTuple hv_DataCodeHandle = new HTuple(), hv_ResultHandles = new HTuple();
+        HTuple hv_DecodedDataStrings = new HTuple(), hv_GradingResults = new HTuple();
+        HTuple hv_JsonString = new HTuple();
+        // Initialize local and output iconic variables 
+        HOperatorSet.GenEmptyObj(out ho_Mat);
+        HOperatorSet.GenEmptyObj(out ho_SymbolXLDs);
+        try
+        {
+            //  Console.WriteLine("DEDE");
+            ho_Mat.Dispose();
+            HOperatorSet.ReadImage(out ho_Mat, filepath);
+
+            hv_DataCodeHandle.Dispose();
+            HOperatorSet.CreateDataCode2dModel("Data Matrix ECC 200", new HTuple(), new HTuple(),
+                out hv_DataCodeHandle);
+            //  Console.WriteLine("DEDE2");
+
+            ho_SymbolXLDs.Dispose(); hv_ResultHandles.Dispose(); hv_DecodedDataStrings.Dispose();
+            if (isRplane)
+            {
+                HOperatorSet.Decompose3(ho_Mat, out _, out _, out ho_gray);
+            }
+            else
+            {
+                HOperatorSet.Rgb1ToGray(ho_Mat, out ho_gray);
+            }
+            if (useContrast)
+            {
+                HOperatorSet.GetImageSize(ho_gray, out Width, out Height);
+                HOperatorSet.Emphasize(ho_gray, out ho_ImageEmphasize, Width, Height, 2);
+                HOperatorSet.FindDataCode2d(ho_ImageEmphasize, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
+                    new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
+            }
+            else
+            {
+                HOperatorSet.FindDataCode2d(ho_gray, out ho_SymbolXLDs, hv_DataCodeHandle, new HTuple(),
+                new HTuple(), out hv_ResultHandles, out hv_DecodedDataStrings);
+            }
+
+
+            // Console.WriteLine("DED33E");
+            decodedString = hv_DecodedDataStrings.ToString();
+            Console.WriteLine("decoded: " + hv_DecodedDataStrings.ToString());
+
+
+            using (HDevDisposeHelper dh = new HDevDisposeHelper())
+            {
+                hv_GradingResults.Dispose();
+                grade_data_code_2d(hv_DataCodeHandle, hv_ResultHandles, "isoiec15415",
+                    "numeric", "grades", out hv_GradingResults);
+            }
+
+            hv_JsonString.Dispose();
+            HOperatorSet.DictToJson(hv_GradingResults, new HTuple(), new HTuple(), out hv_JsonString);
+
+
+            HTuple hv_ResultValues2 = new HTuple();
+            HTuple hv_ResultValues4 = new HTuple();
+
+            using (HDevDisposeHelper dh = new HDevDisposeHelper())
+            {
+                hv_ResultValues2.Dispose();
+                HOperatorSet.GetDataCode2dResults(hv_DataCodeHandle, hv_ResultHandles.TupleSelect(
+                    0), "quality_isoiec15415", out hv_ResultValues2);
+            }
+            using (HDevDisposeHelper dh = new HDevDisposeHelper())
+            {
+                hv_ResultValues4.Dispose();
+                HOperatorSet.GetDataCode2dResults(hv_DataCodeHandle, hv_ResultHandles.TupleSelect(
+                    0), "quality_isoiec15415_intermediate", out hv_ResultValues4);
+            }
+            Console.WriteLine("Grades : " + hv_ResultValues2.ToString());
+            Console.WriteLine("Inter: " + hv_ResultValues4.ToString());
+
+
+
+            //  Console.WriteLine("JSN: " + hv_JsonString.ToString());
+            // Console.WriteLine("DEDE55");
+            //    Console.WriteLine("DEDE44 " + hv_JsonString.ToString());
+
+
+            // var jso = new
+            // {
+            //     decoded = hv_DecodedDataStrings.ToString(),
+            //     jsonData = hv_JsonString.ToString()
+            // };
+            // return jso;
+            // decodedString = hv_DecodedDataStrings.ToString();
+
+            return hv_ResultValues4.ToString();
         }
         catch (HalconException HDevExpDefaultException)
         {
